@@ -58,31 +58,31 @@ function [rawdata, noise, PULSEQ, study_info] = pulseq_read_meas(path_raw, path_
 
     %% load rawdata and pulseq backups depending on vendor
     switch vendor
-        case 'Siemens' % for Siemens, we can automatically link rawdata and pulseq backups
-            [twix_obj, study_info, PULSEQ] = pulseq_read_meas_siemens(path_raw);
+        case 'Siemens' % Siemens Healthcare
+            [twix_obj, study_info, PULSEQ] = pulseq_read_meas_Siemens(path_raw);
             rawdata = permute(twix_obj.image.unsorted(), [2, 3, 1]); % coils x tr x adc
             if ~isempty(path_backup)
                 load(path_backup);
                 warning('automatic PULSEQ backup was overwritten for Siemens scan!');
             end            
 
-        case 'UnitedImaging'
-            [rawdata, study_info, PULSEQ] = pulseq_read_meas_united_imaging(path_mat);
+        case 'UI' % United Imaging Healthcare
+            [rawdata, study_info, PULSEQ] = pulseq_read_meas_UI(path_mat);
             rawdata = (rawdata(:,:,1:2:end) + rawdata(:,:,2:2:end)) / 2; % remove oversampling
             if ~isempty(path_backup)
                 load(path_backup);
                 warning('automatic PULSEQ backup was overwritten for United Imaging scan!');
             end
 
-        case 'GE'
-            [rawdata, study_info, PULSEQ] = pulseq_read_meas_ge(path_mat); % to do
+        case 'GE' % General Electric
+            [rawdata, study_info, PULSEQ] = pulseq_read_meas_GE(path_mat); % to do
             if ~isempty(path_backup)
                 load(path_backup);
                 warning('automatic PULSEQ backup was overwritten for GE scan!');
             end
 
-        case 'Philips'
-            [rawdata, study_info, PULSEQ] = pulseq_read_meas_philips(path_mat); % to do
+        case 'Philips' % Koninklijke Philips
+            [rawdata, study_info, PULSEQ] = pulseq_read_meas_Philips(path_mat); % to do
             if ~isempty(path_backup)
                 load(path_backup);
                 warning('automatic PULSEQ backup was overwritten for Philips scan!');

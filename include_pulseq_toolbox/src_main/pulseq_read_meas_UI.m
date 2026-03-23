@@ -1,4 +1,4 @@
-function [rawdata, study_info, PULSEQ] = pulseq_read_meas_united_imaging(study)
+function [rawdata, study_info, PULSEQ] = pulseq_read_meas_UI(study)
 
 % Author: Maximilian Gram, University Hospital Wuerzburg, Wuerzburg, Germany; V1, 23.03.2026
 
