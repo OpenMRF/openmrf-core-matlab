@@ -48,7 +48,6 @@ colorbar;
 colormap(turbo(1000));
 
 %%
-res.T1_Map = T1_Map;
-res.Images = Images;
-res.TI = TI;
-save_study_results(study_info.study_name, res, study_info.study_path);
+res.T1_Map = T1_Map; res.Images = Images;
+params.TI = TI;
+save_study_results(res, params, study_info);
