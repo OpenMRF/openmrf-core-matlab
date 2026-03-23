@@ -8,6 +8,12 @@ function [ktraj_meas, ktraj_hash] = TRAJ_reco(path_raw, path_backup, vendor, plo
 % path_backup: path of pulseq workspace backup; not necessary for Siemens
 % vendor:      vendor name
 
+if strcmp(vendor, 'UI') % trajectory data are inverted for United Imaging
+    vz = -1;
+else
+    vz = 1;
+end
+
 %% load trajectory rawdata and pulseq backup
 [rawdata, ~, PULSEQ] = pulseq_read_meas(path_raw, path_backup, vendor);
 
@@ -163,8 +169,8 @@ if strcmp(PULSEQ.TRAJ.method, 'robison')
     clear rawdata_xA rawdata_xB rawdata_yA rawdata_yB;
 
     % get k-space trajectory via slice offset
-    ktraj_meas_x = (phase_xA + phase_xB) / 4 / PULSEQ.TRAJ.slice_offset /2/pi;
-    ktraj_meas_y = (phase_yA + phase_yB) / 4 / PULSEQ.TRAJ.slice_offset /2/pi;
+    ktraj_meas_x = vz * (phase_xA + phase_xB) / 4 / PULSEQ.TRAJ.slice_offset /2/pi;
+    ktraj_meas_y = vz * (phase_yA + phase_yB) / 4 / PULSEQ.TRAJ.slice_offset /2/pi;
     ktraj_meas(1,:,:) = ktraj_meas_x;
     ktraj_meas(2,:,:) = ktraj_meas_y;
     

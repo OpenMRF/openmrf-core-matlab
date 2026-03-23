@@ -1,10 +1,15 @@
-function [twix_obj, study_info, PULSEQ] = pulseq_read_meas_siemens(study)
+function [twix_obj, study_info, PULSEQ] = pulseq_read_meas_Siemens(study)
 
 % Author: Maximilian Gram, University Hospital Wuerzburg, Wuerzburg, Germany; V1, 09.03.2026
 % Author: Maximilian Gram, University Hospital Wuerzburg, Wuerzburg, Germany; V2, 22.03.2026
 
 %% check for file existence and emit clear exception upon missing file
 study = strrep(study, '\', '/');
+[temp_path, temp_name, temp_ext] = fileparts(study);
+if isempty(temp_ext)
+    study = [temp_path '/' temp_name '.dat'];
+end
+clear temp_path temp_name temp_ext;
 checkexists(study, file_qualifier='scanner raw data');
 
 %% Read Siemens meas file from VB/VD MRI raw data

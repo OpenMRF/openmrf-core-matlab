@@ -11,10 +11,19 @@ function [rawdata, study_info, PULSEQ] = pulseq_read_meas_UI(study)
 %   time_stamps:   NR x 1, adc time stamps [s]
 %   f0:            larmor frequency [Hz]
 %   soft_delay:    N x 1, [s] list with the soft delay set in the UI interface
+
+%% check for file existence and emit clear exception upon missing file
 study = strrep(study, '\', '/');
-load(study);
+[temp_path, temp_name, temp_ext] = fileparts(study);
+if isempty(temp_ext)
+    study = [temp_path '/' temp_name '.mat'];
+end
+clear temp_path temp_name temp_ext;
+checkexists(study, file_qualifier='scanner raw data');
 
 %% check existence of varibales
+load(study);
+
 if ~exist('rawdata', 'var')
     error(['rawdata does not exist!']);
 end
