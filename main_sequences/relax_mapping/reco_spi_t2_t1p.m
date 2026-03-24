@@ -19,22 +19,22 @@ Images = real(Images .* exp(-1i*repmat(angle(Images(1,:,:)),[Nimages,1,1])));
 
 if isfield(PULSEQ, 'T2')
     TE = PULSEQ.T2.prep_times;
-    res.TE = TE;
+    params.TE = TE;
     [ T12p_Map, ~, R2_Map ] = mg_map_T12p( Images, TE, mask );
 end
 if isfield(PULSEQ, 'MLEV')
     t2prep = PULSEQ.MLEV.t2_prep_times;
-    res.t2prep = t2prep;
+    params.t2prep = t2prep;
     [ T12p_Map, ~, R2_Map ] = mg_map_T12p( Images, t2prep, mask );
 end
 if isfield(PULSEQ, 'SL')
     tSL = PULSEQ.SL.tSL;
-    res.tSL = tSL;
+    params.tSL = tSL;
     [ T12p_Map, ~, R2_Map ] = mg_map_T12p( Images, tSL, mask );
 end
 if isfield(PULSEQ, 'ADIASL')
     tSL = PULSEQ.ADIASL.adia_prep_times;
-    res.tSL = tSL;
+    params.tSL = tSL;
     [ T12p_Map, ~, R2_Map ] = mg_map_T12p( Images, tSL, mask );
 end
 
@@ -64,6 +64,5 @@ colorbar;
 colormap(turbo(1000));
 
 %%
-res.T12p_Map = T12p_Map;
-res.Images = Images;
-save_study_results(study_info.study_name, res, study_info.study_path);
+res.T12p_Map = T12p_Map; res.Images = Images;
+save_study_results(res, params, study_info);
