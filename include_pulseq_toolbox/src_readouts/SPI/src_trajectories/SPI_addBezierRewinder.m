@@ -22,11 +22,13 @@ if nargin < 4 || isempty(N)
     N = 250;
 end
 if nargin < 3 || isempty(beta)
-    beta = 0.2 * kabs;
+    beta = 0.0;
 end
 if nargin < 2 || isempty(alpha)
-    alpha = 0.2 * kabs;
+    alpha = 0.5;
 end
+alpha = alpha * kabs;
+beta  = beta  * kabs;
 
 % End tangent (last non-zero segment)
 tol = 1e-8 * max(abs(k));
