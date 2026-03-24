@@ -5,7 +5,7 @@
 %% start reco
 clear
 
-study = 2;
+study = 1;
 
 switch study
 
@@ -35,7 +35,7 @@ switch study
                        'meas_MID00864_FID16221_se_te_250.dat'};
 
     case 2  % rawdata: United Imaging, uMR790, 1.5T (Houston)
-    vendor      =  'UnitedImaging'; 
+    vendor      =  'UI'; 
     ref_name    =  '1.5T_MnCl2_Houston';
     study_path  = 'Q:/data/Pulseq/Rawdata/tomgr/United_Imaging_1,5T/260218_OpenMRF_NIST/mat/';
     study_name  = 'nist_ref_rawdata.mat';
@@ -60,7 +60,8 @@ switch vendor
             rawdata_T2(j,:,:,:) = permute(twix_obj,[2,3,1]); % TE x coils x Ny x Nx
             clear twix_obj;
         end
-    case 'UnitedImaging' % load rawdata from mat files        
+
+    case 'UI' % load rawdata from mat files        
         load([study_path study_name]);
         rawdata_T1 = permute(irse_rawdata, [1 4 2 3]); % TI x coils x Ny x Nx
         rawdata_T2 = permute(sese_rawdata, [1 4 2 3]); % TE x coils x Ny x Nx
@@ -87,16 +88,16 @@ for j=1:size(Images_coils_T2, 1)
 end
 clear j Images_coils_T1 Images_coils_T2 cmaps_T1 cmaps_T2;
 
+% rotate images to real axis
+Images_T1 = real(Images_T1 .* exp(-1i*repmat(angle(Images_T1(end,:,:)),[size(Images_T1,1),1,1]))); % use the last image as the reference
+Images_T2 = real(Images_T2 .* exp(-1i*repmat(angle(Images_T2(1,:,:)),[size(Images_T2,1),1,1])));   % use the first image as the reference
+
 % zero interpolation filling
 zero_params.onoff  = 1;
 zero_params.radius = 6.0;
 zero_params.factor = 2.0;
 Images_T1 = mg_zero_filling(Images_T1, zero_params);
 Images_T2 = mg_zero_filling(Images_T2, zero_params);
-
-% rotate images to real axis
-Images_T1 = real(Images_T1 .* exp(-1i*repmat(angle(Images_T1(end,:,:)),[size(Images_T1,1),1,1]))); % use the last image as the reference
-Images_T2 = real(Images_T2 .* exp(-1i*repmat(angle(Images_T2(1,:,:)),[size(Images_T2,1),1,1])));   % use the first image as the reference
 
 %% T1 and T2 mapping
 
@@ -129,8 +130,8 @@ ylims          = [min(ylims), max(ylims)] + 3*[-1 1];
 %% calc mean in ROIs
 r  = 3;
 for j = 1:N
-    T1(j,1) = roi_mean(T1_Map, xc(j), yc(j), r, 0.95);
-    T2(j,1) = roi_mean(T2_Map, xc(j), yc(j), r, 0.95);
+    T1(j,1) = roi_mean(T1_Map, xc(j), yc(j), r, 0.25, R2_Map_T1, 0.95);
+    T2(j,1) = roi_mean(T2_Map, xc(j), yc(j), r, 0.25, R2_Map_T2, 0.95);
 end
 
 %% vis results
