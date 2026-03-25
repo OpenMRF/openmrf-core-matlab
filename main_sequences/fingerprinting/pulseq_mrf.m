@@ -71,7 +71,7 @@ SPI.geo.flag_rv       = 0;
 
 % k-space projection params
 SPI.proj.mode = 'RoundGoldenAngle'; % 'Equal2Pi' 'RoundGoldenAngle'
-SPI.proj.Nid  = 48; % number of identical/unique projections
+SPI.proj.Nid  = 48; % number of unique projections
 
 % gradient & slew rate limitation factors
 SPI.lim_exc_slew   = 0.9; % slice excitation

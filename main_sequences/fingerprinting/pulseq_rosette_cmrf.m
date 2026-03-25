@@ -110,7 +110,7 @@ SPI.lim_spoil_slew = 0.6; % slice spoiling
 
 % k-space projection params
 SPI.proj.mode = 'RoundGoldenAngle'; % 'Equal2Pi' 'RoundGoldenAngle'
-SPI.proj.Nid  = 48; % number of identical/unique projections
+SPI.proj.Nid  = 48; % number of unique projections
 
 % visulize trajectory and fat suppression
 SPI.geo.flag_plot = 1;
