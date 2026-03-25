@@ -65,4 +65,4 @@ colormap(turbo(1000));
 
 %%
 res.T12p_Map = T12p_Map; res.Images = Images;
-save_study_results(res, params, study_info);
+save_study_results(res, params, study_info, 'prompt', 1);
