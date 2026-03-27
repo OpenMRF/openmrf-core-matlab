@@ -31,7 +31,8 @@ if ~exist('external_name', 'var')
     error(['external_name does not exist!']);
 end
 if ~exist('md5_hash', 'var')
-    error(['md5_hash does not exist!']);
+    warning(['md5_hash does not exist!']);
+    md5_hash = [];
 end
 if ~exist('time_stamps', 'var')
     time_stamps = [];
@@ -39,7 +40,6 @@ end
 if ndims(time_stamps)>1
     time_stamps = squeeze(time_stamps);
 end
-time_stamps = time_stamps(:);
 if ~exist('f0', 'var')
     f0 = [];
 end
@@ -94,6 +94,7 @@ study_info.meas_name          = []; % ask United Imaging
 study_info.meas_date          = []; % ask United Imaging
 study_info.meas_clock         = []; % ask United Imaging
 study_info.f0                 = f0;
-study_info.time_stamps        = time_stamps;
+study_info.time_stamps        = time_stamps(:) *1e-4;  % [s] column vector
+study_info.soft_delays        = soft_delay(:)  * 1e-3; % [s] column vector
 
 end

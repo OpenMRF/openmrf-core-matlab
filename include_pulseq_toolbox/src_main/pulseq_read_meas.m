@@ -79,4 +79,18 @@ function [rawdata, noise, PULSEQ, study_info] = pulseq_read_meas(path_raw, path_
         noise = [];
     end
 
+    %% check adc time stamps and soft delays
+    if ~isfield(study_info, 'time_stamps')
+        study_info.time_stamps = [];
+    end
+    if ~isfield(study_info, 'soft_delays')
+        study_info.soft_delays = [];
+    end
+    if ~isempty(study_info.time_stamps) % if noise prescans have no time stamps
+        if numel(study_info.time_stamps) < (size(noise,2)+size(rawdata,2))
+            n_dummy = (size(noise,2)+size(rawdata,2)) - numel(study_info.time_stamps);
+            study_info.time_stamps = [ (1:n_dummy)'*1e-12; study_info.time_stamps ]; % we fix it with nearly zero values
+        end
+    end
+
 end

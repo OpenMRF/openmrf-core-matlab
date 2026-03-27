@@ -88,7 +88,8 @@ study_info.meas_name          = meas_name;
 study_info.meas_date          = meas_date;
 study_info.meas_clock         = meas_clock;
 study_info.f0                 = twix_obj.hdr.Meas.lFrequency;
-study_info.time_stamps        = twix_obj.image.timestamp(:);
+study_info.time_stamps        = twix_obj.image.timestamp(:) * 2.5 * 1e-3; % [s] column vector
+% study_info.soft_delays        = twix_obj.hdr.Meas.adFree(XXX) *1e-3; the soft delay is written in the .dat file under adFree. however, mapVBVD does not read it!
 if ~exist('PULSEQ','var')
    PULSEQ = 0; 
 end

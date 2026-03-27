@@ -32,10 +32,11 @@ params_dict.comp_energy = 0.9999;   % svd compression energy: 0 for uncompressed
 params_dict.N_iso       = 1000;     % number of isochromats for bloch simulation
 params_dict.s_fac       = 2;        % factor for out-of-slice simulation
 params_dict.f0          = [];       % larmor frequency f0: required to simulate rf pulses with ppm freq offsets
-params_dict.time_stamps = study_info.time_stamps; % adc times stamps: required for correction of trigger delays in cMRF
 params_dict.soft_delays = [];       % soft delay user input: required for correction of the acq window in cMRF
 params_dict.flag_kz     = [];       % find kz partitions for stacked 3D MRF -> eliminate unnecessary partitions
 params_dict.echo_mode   = [];       % echo mode; default: 'spiral_out'
+params_dict.time_stamps = study_info.time_stamps; % [s] adc times stamps: required for correction of trigger delays in cMRF
+params_dict.soft_delays = study_info.soft_delays; % [s] soft delay user input: required for correction of the acq window in cMRF
 
 %% parameters: dictionary and look-up table
 

@@ -10,7 +10,7 @@ function [SEQ, SIM] = MRF_read_seq_file(seq_file, f0, time_stamps, soft_delays, 
 % seq_file:        path of the .seq file
 % f0:              larmor frequency [Hz] for off-resonant pulses or adcs
 % time_stamps:     nadc x 1 array of adc time stamps [s]
-% soft_delays:     n x 1 array of input delays (e.g. for RR tuning)
+% soft_delays:     n x 1 array of input delays (e.g. for RR tuning) [s]
 % flag_kz:         0 -> no kz paritions; 1 -> search for START/STOP labels and remove unneccesary kz partitions
 % echo_mode:       'spiral_out' 'center' 'auto'
 % adc_npad:        can be 2x1 or 1x1 and defines the start and end of adc padding
@@ -118,7 +118,7 @@ SEQ.SHAPES      = read_seq_file_shapes(SEQ.FILE);
 
 %% read and apply extension specifications
 SEQ = corr_soft_delays(SEQ, soft_delays);        % correct timings in case of soft delays
-SEQ = corr_trigger_delays(SEQ, time_stamps); % correct timings in case of cardiac trigger
+SEQ = corr_trigger_delays(SEQ, time_stamps);     % correct timings in case of cardiac trigger
 SEQ = filter_kz_partitions(SEQ, flag_kz);        % delete unnecessary blocks in case of kz partitions
 SEQ = correct_GE_timings(SEQ);                   % add a 117us delay for each GE TRID label
 SEQ.BLOCKS(find(SEQ.BLOCKS(:,2)==0),:) = [];     % delete blocks which only contain labels
