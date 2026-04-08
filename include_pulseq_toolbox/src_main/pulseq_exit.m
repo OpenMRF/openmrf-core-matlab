@@ -226,6 +226,8 @@ if flag_GE == 1 && flag_backup>0
         GE_adj_receive_gain(system, 5, 2, SPI.adc, pi/2, FOV.dz, external_path, wip_id);
     elseif exist('GRE', 'var')
         GE_adj_receive_gain(system, 5, 2, GRE.adc, pi/2, FOV.dz, external_path, wip_id);
+    elseif exist('TRAJ', 'var')
+        GE_adj_receive_gain(system, 5, 2, TRAJ.adc, pi/2, 0.01, external_path, wip_id);
     end
 end
 
