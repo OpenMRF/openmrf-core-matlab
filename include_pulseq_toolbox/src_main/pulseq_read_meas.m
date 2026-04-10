@@ -57,7 +57,7 @@ function [rawdata, noise, PULSEQ, study_info] = pulseq_read_meas(path_raw, path_
             end
 
         case 'GE' % General Electric
-            [rawdata, study_info, PULSEQ] = pulseq_read_meas_GE(path_raw); % to do
+            [rawdata, study_info, PULSEQ] = pulseq_read_meas_GE(path_raw);
             if ~isempty(path_backup)
                 load(path_backup);
                 warning('automatic PULSEQ backup was overwritten for GE scan!');
