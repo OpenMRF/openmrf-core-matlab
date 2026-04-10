@@ -214,7 +214,7 @@ if flag_backup>0
         
         % send .seq file to hydra -> only for users from EP5 lab
         if (flag_backup>2)
-            pulseq_scp_hydra(pulseq_user, external_path);
+            pulseq_scp_skyra(pulseq_user, external_path);
         end
 
     end
