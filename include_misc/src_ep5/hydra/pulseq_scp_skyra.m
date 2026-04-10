@@ -7,7 +7,8 @@ function [out] = pulseq_scp_skyra(pulseq_user, external_path)
     temp_cmd  = ['pscp -pw "' char(str2num(fgetl(temp_file1))-ceil(exp(pi))) '" -sftp ' external_path ' ' pulseq_user fgetl(temp_file2) pulseq_user '/'];
     system(temp_cmd);
     fclose(temp_file1);
-    clear temp_file1 temp_line1 temp_line2 temp_cmd;
+    fclose(temp_file2);
+    clear temp_file1 temp_file2 temp_line1 temp_line2 temp_cmd;
     out = 0;
 
 end
