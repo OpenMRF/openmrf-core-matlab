@@ -32,7 +32,7 @@ end
 
 %% shift slice position: default 0
 if ~isfield(FOV, 'z_offset') 
-    FOV.z_offset = 0;
+    FOV.z_offset = 0; % positive/negative -> food/head direction
 end
 
 %% reorder struct field names
