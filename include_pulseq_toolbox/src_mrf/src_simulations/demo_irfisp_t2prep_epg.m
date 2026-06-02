@@ -22,17 +22,21 @@ P.T2 = [  45;   80;  200;  100]' *1e-3;    % [s]
 P.T1 = P.T1(:); P.T2 = P.T2(:);
 % optional: P.dw0 = 0*P.T1; P.db1 = ones(size(P.T1));
 
-%% -------- flip-angle / TR pattern --------
-% load the bundled 'yun' IR-FISP pattern if available, else a smooth ramp
-if exist('MRF_get_FAs_TRs','file')==2
-    [FAs, TRs] = MRF_get_FAs_TRs('yun', 0);
-    FAs(FAs==0) = 1e-6;
-else
-    NR  = 1000;
-    FAs = (10 + 50*sin((1:NR)'/NR*pi)) * pi/180;   % [rad]
-    TRs = 12e-3 * ones(NR,1);                       % [s]
+%% -------- flip-angle / TR pattern (non-canonical: 5 sinusoidal arches) --------
+% Build a custom FA train from 5 half-sine "arches", each ramping 0 -> peak -> 0.
+% Peak flip angles per arch [deg]; tweak freely (this is NOT the Yun pattern).
+arch_amp = [40 50 60 50 38];                   % [deg] max amplitude of each arch
+n_per    = 200;                                 % readouts per arch
+FAs = zeros(numel(arch_amp)*n_per, 1);          % [deg]
+for a = 1:numel(arch_amp)
+    k   = (1:n_per)';
+    idx = (a-1)*n_per + k;
+    FAs(idx) = arch_amp(a) * sin(pi*k/n_per);   % half-sine arch
 end
-NR = numel(FAs);
+FAs = FAs * pi/180;                             % [deg] -> [rad]
+FAs(FAs==0) = 1e-6;                             % avoid exact-zero flips
+NR  = numel(FAs);
+TRs = 12e-3 * ones(NR,1);                        % [s] constant TR
 
 %% -------- sequence options --------
 opt.TE           = 2e-3;       % [s] echo time
