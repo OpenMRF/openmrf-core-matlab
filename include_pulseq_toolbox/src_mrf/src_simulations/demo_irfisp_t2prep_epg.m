@@ -59,12 +59,38 @@ opt.prep = { {'inv', 20e-3}, {'t2', 60e-3, t2prep_at} };
 fprintf('simulated %d readouts x %d tissues. SIM has %d operator steps.\n', ...
         size(Mxy,1), size(Mxy,2), numel(SIM.ID));
 
-%% -------- plot fingerprints --------
-figure('Name','ideal IR-FISP + T2-prep fingerprints');
-subplot(2,1,1); plot(abs(Mxy));  ylabel('|Mxy|'); grid on;
-title(sprintf('inv(TI=20ms) + T2prep(\\tau=60ms) + FISP, NR=%d', NR));
-subplot(2,1,2); plot(real(Mxy)); hold on; plot(imag(Mxy),'--');
-xlabel('readout #'); ylabel('Re / Im (Mxy)'); grid on;
+%% -------- plot: sequence pattern + fingerprints in one figure --------
+figure('Name','ideal IR-FISP + T2-prep: pattern & fingerprints');
+
+% (1) flip-angle pattern
+subplot(4,1,1);
+plot(abs(FAs)*180/pi, '-'); grid on; hold on;
+ylabel('FA [deg]');
+title(sprintf('inv(TI=20ms) + T2prep(\\tau=60ms) at readout %d + FISP, NR=%d', ...
+              t2prep_at, NR));
+yl = ylim;
+plot([t2prep_at t2prep_at], yl, 'r--');     % mark the T2-prep insertion point
+text(t2prep_at, yl(2), ' T2 prep', 'Color','r', ...
+     'VerticalAlignment','top', 'HorizontalAlignment','left');
+ylim(yl);
+
+% (2) TR pattern
+subplot(4,1,2);
+plot(TRs*1e3, '-'); grid on; hold on;
+ylabel('TR [ms]');
+yl = ylim; plot([t2prep_at t2prep_at], yl, 'r--'); ylim(yl);
+
+% (3) fingerprint magnitude
+subplot(4,1,3);
+plot(abs(Mxy)); grid on; hold on;
+ylabel('|Mxy|');
+yl = ylim; plot([t2prep_at t2prep_at], yl, 'r--'); ylim(yl);
+
+% (4) fingerprint real / imag
+subplot(4,1,4);
+plot(real(Mxy)); hold on; plot(imag(Mxy),'--'); grid on;
+xlabel('readout #'); ylabel('Re / Im (Mxy)');
+yl = ylim; plot([t2prep_at t2prep_at], yl, 'r--'); ylim(yl);
 
 %% ==================== self-check: T2-prep weighting ====================
 % A T2 prep on a single tissue with very long T1 (no T1 recovery during tau)
