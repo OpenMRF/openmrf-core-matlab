@@ -39,8 +39,16 @@ opt.TE           = 2e-3;       % [s] echo time
 opt.spoil_twists = 1;          % FISP unbalanced gradient spoiler
 opt.t2_nrefocus  = 2;          % MLEV-2 refocusing in the T2 prep
 
-% preparation train BEFORE the readout: inversion (TI) then a T2 prep (tau)
-opt.prep = { {'inv', 20e-3}, {'t2', 60e-3} };
+% --- T2-prep placement switch ---
+% Index of the readout the T2 prep is inserted immediately BEFORE. The EPG
+% state carries through continuously, so this genuinely re-weights the train
+% from that point on.  1   = classic prep-before-readout layout (start);
+%                      500 = drop the T2 prep in the middle of the train.
+t2prep_at = 250;                              % <-- set e.g. 500 to place mid-train
+t2prep_at = min(max(round(t2prep_at),1), NR+1);
+
+% inversion (TI) stays at the start; the T2 prep (tau) is placed at t2prep_at
+opt.prep = { {'inv', 20e-3}, {'t2', 60e-3, t2prep_at} };
 
 %% -------- run --------
 [Mxy, SIM] = MRF_sim_irfisp_epg(FAs, TRs, P, opt);

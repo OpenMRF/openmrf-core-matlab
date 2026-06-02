@@ -26,20 +26,27 @@ function [Mxy, SIM] = MRF_sim_irfisp_epg(FAs, TRs, P, opt)
 %                        N_states allocated by MRF_sim_EPG = ceil(sum|GZ|/2).)
 %   .rf_phase     [rad] extra excitation phase (RF spoiling),
 %                       scalar or (NR x 1).                       default 0
-%   .prep         {cell} ordered preparation blocks placed BEFORE the readout
-%                        train (see below).                       default {}
+%   .prep         {cell} ordered preparation blocks (see below). By default
+%                        they are placed BEFORE the readout train, but each
+%                        block may carry a placement index to sit mid-train.
+%                                                                  default {}
 %   .ref_phase    [rad] reference phase for prep RF pulses.       default 0
 %   .t2_nrefocus  [ ]  number of refocusing pulses in a T2 prep.  default 2
 %
-% Preparation blocks (opt.prep), an ordered cell array, each entry {type,val}:
+% Preparation blocks (opt.prep), an ordered cell array, each entry
+% {type,val} or {type,val,at} where the optional 3rd element 'at' is the
+% readout index the block is inserted immediately BEFORE:
 %   {'inv', TI}      inversion (180 about x) + perfect crush + recovery TI [s]
 %   {'t2',  tau}     T2 prep: 90 tipdown -> (MLEV 180s spanning tau) -> 90 tipup
 %                    + perfect crush. tau is the T2-prep echo time [s].
 %                    Ideal weighting on stored Mz is exp(-tau/T2).
 %   {'delay', t}     pure free relaxation/recovery of t [s]
-% To model segmented / interleaved schemes (e.g. cardiac MRF with a prep per
-% heartbeat), call this builder per segment, or splice operator lists — the
-% per-TR readout block is emitted verbatim in the loop below.
+%   {'t2', tau, 500} same T2 prep, but emitted between readouts 499 and 500
+%                    (the magnetization state carries through continuously).
+% 'at' defaults to 1 (start of the train, the classic prep-before-readout
+% layout); 'at' = NR+1 places the block after the final readout. To model
+% segmented / interleaved schemes (e.g. cardiac MRF with a prep per heartbeat),
+% give several blocks distinct 'at' indices, or splice operator lists.
 %
 % --------------------------------------------------------------- outputs ---
 % Mxy : (NR x N_dict) complex transverse signal at each ADC (F0 state),
@@ -81,34 +88,27 @@ function [Mxy, SIM] = MRF_sim_irfisp_epg(FAs, TRs, P, opt)
     assert(opt.spoil_twists >= 1, ...
         'spoil_twists must be >= 1 (EPG requires at least one dephasing state).');
 
+    % ----- resolve prep placement (which readout each block sits before) -----
+    nprep   = numel(opt.prep);
+    prep_at = ones(nprep,1);                 % default: before the first readout
+    for ip = 1:nprep
+        if numel(opt.prep{ip}) >= 3 && ~isempty(opt.prep{ip}{3})
+            prep_at(ip) = round(opt.prep{ip}{3});
+        end
+    end
+    assert(all(prep_at >= 1 & prep_at <= NR+1), ...
+        'prep placement index must be in [1, NR+1] (NR = %d).', NR);
+
     % event matrix columns: [ID, RF(complex), GZ, DT]
     E = zeros(0,4);
 
-    % ===================== preparations (before train) =====================
-    for ip = 1:numel(opt.prep)
-        blk  = opt.prep{ip};
-        type = blk{1};
-        val  = blk{2};
-        switch lower(type)
-            case {'inv','inversion'}
-                E = [E; rf_evt(pi, opt.ref_phase)];   %#ok<AGROW>  180 inversion
-                E = [E; crush_evt()];                  %#ok<AGROW>  kill transverse
-                E = [E; relax_evt(val)];               %#ok<AGROW>  TI recovery
-
-            case {'t2','t2prep'}
-                E = [E; t2prep_evts(val, opt.ref_phase, opt.t2_nrefocus)]; %#ok<AGROW>
-
-            case {'delay','recovery','d'}
-                E = [E; relax_evt(val)];               %#ok<AGROW>
-
-            otherwise
-                error('MRF_sim_irfisp_epg:prep', 'unknown prep type: %s', type);
-        end
-    end
-
-    % ===================== FISP readout train =====================
+    % ===================== FISP readout train (preps interleaved) ==========
     PHI = zeros(NR,1);
     for n = 1:NR
+        % emit any preparation block scheduled immediately before this readout
+        for ip = find(prep_at(:).' == n)
+            E = [E; build_prep(opt.prep{ip}, opt)];    %#ok<AGROW>
+        end
         exc_phase = angle(FAs(n)) + ph(n);
         E = [E; rf_evt(abs(FAs(n)), exc_phase)];      %#ok<AGROW>  excitation
         E = [E; relax_evt(TE(n))];                     %#ok<AGROW>  -> TE
@@ -116,6 +116,10 @@ function [Mxy, SIM] = MRF_sim_irfisp_epg(FAs, TRs, P, opt)
         PHI(n) = exc_phase;                            %            demodulation
         E = [E; relax_evt(TRs(n)-TE(n))];              %#ok<AGROW>  -> end of TR
         E = [E; spoil_evt(opt.spoil_twists)];          %#ok<AGROW>  FISP spoiler
+    end
+    % preparation blocks scheduled after the final readout (at = NR+1)
+    for ip = find(prep_at(:).' == NR+1)
+        E = [E; build_prep(opt.prep{ip}, opt)];        %#ok<AGROW>
     end
 
     % ===================== assemble SIM struct =====================
@@ -131,6 +135,27 @@ function [Mxy, SIM] = MRF_sim_irfisp_epg(FAs, TRs, P, opt)
     % ===================== simulate =====================
     Mxy = MRF_sim_EPG(SIM, P, 0);
 
+end
+
+% ------------------------------------------------------------- preparations ---
+function E = build_prep(blk, opt)
+% Emit the event matrix for one preparation block. blk is {type,val} or
+% {type,val,at}; the optional 'at' placement index is consumed by the caller
+% and ignored here.
+    type = blk{1};
+    val  = blk{2};
+    switch lower(type)
+        case {'inv','inversion'}
+            E = [rf_evt(pi, opt.ref_phase);   ...   % 180 inversion
+                 crush_evt();                 ...   % kill transverse
+                 relax_evt(val)];                   % TI recovery
+        case {'t2','t2prep'}
+            E = t2prep_evts(val, opt.ref_phase, opt.t2_nrefocus);
+        case {'delay','recovery','d'}
+            E = relax_evt(val);
+        otherwise
+            error('MRF_sim_irfisp_epg:prep', 'unknown prep type: %s', type);
+    end
 end
 
 % ----------------------------------------------------------------- events ---
