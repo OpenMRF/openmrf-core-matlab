@@ -12,8 +12,8 @@ function P = AHP_optimize_params(tau, wmax)
     c = 1;
     for j=1:numel(temp_df0)
     for k=1:numel(temp_db1)
-        db1(c,1)    = temp_db1(j);
-        df0(c,1)    = temp_df0(k);
+        db1(c,1)    = temp_db1(k);
+        df0(c,1)    = temp_df0(j);
         weight(c,1) = temp_w1(j) * temp_w2(k);
         c = c + 1;
     end

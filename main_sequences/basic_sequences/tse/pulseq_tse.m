@@ -42,7 +42,7 @@ TSE.mode_exc  = 'sinc'; % 'sigpy_SLR' or 'sinc'
 TSE.mode_rfc  = 'sinc'; % 'sigpy_SLR' or 'sinc'
 TSE.enc_mode  = 'centric';
 
-[TSE, ktraj_adc, ktraj_full] = TSE_init(TSE, FOV, system);
+[TSE, ktraj_adc, ktraj_full] = TSE_init(TSE, FOV, system, 1);
 
 %% add sequence blocks
 ndummy = TSE.Ndummy;

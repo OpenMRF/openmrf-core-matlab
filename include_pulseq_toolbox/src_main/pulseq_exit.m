@@ -14,6 +14,7 @@ seq.setDefinition('Rot_Matrix', FOV.Rot_Mat);
 
 %% calculate total sequence duration
 TotalDuration = sum(seq.blockDurations);
+% seq.setDefinition('TotalDuration', TotalDuration);
 disp(' ')
 if TotalDuration > 180
     disp(['   acq time:  ' num2str(round(TotalDuration/60,1)) 'min'])

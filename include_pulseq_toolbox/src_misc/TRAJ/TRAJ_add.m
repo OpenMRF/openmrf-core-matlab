@@ -147,16 +147,16 @@ seq.addBlock(TRAJ.d1);
 
 if loop_av > 0
     if strcmp(temp_g_read.channel, 'x')
-        seq.addTRID(['read_x_' num2str(loop_NR)]);
+        seq.addTRID(['read_x_' num2str(loop_NR) num2str(mod(loop_traj, 2))]);
     elseif strcmp(temp_g_read.channel, 'y')
-        seq.addTRID(['read_y_' num2str(loop_NR)]);
+        seq.addTRID(['read_y_' num2str(loop_NR) num2str(mod(loop_traj, 2))]);
     end
     seq.addBlock(temp_g_read, temp_adc);
 else
     if strcmp(temp_g_read.channel, 'x')
-        seq.addTRID('dummy_x');
+        seq.addTRID(['dummy_x_' num2str(loop_NR) num2str(mod(loop_traj, 2))]);
     elseif strcmp(temp_g_read.channel, 'y')
-        seq.addTRID('dummy_y');
+        seq.addTRID(['dummy_y_' num2str(loop_NR) num2str(mod(loop_traj, 2))]);
     end
     seq.addBlock(temp_g_read);
 end
