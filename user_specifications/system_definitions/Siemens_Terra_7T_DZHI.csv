@@ -1,8 +1,8 @@
 B0;7.0
 gamma;4.257747851783256e+07
-maxGrad;135
+maxGrad;43
 gradUnit;mT/m
-maxSlew;250
+maxSlew;180
 slewUnit;T/m/s
 maxB1;20
 rfDeadTime;1e-4
@@ -12,4 +12,4 @@ adcRasterTime;1e-7
 rfRasterTime;1e-6
 gradRasterTime;1e-5
 blockDurationRaster;1e-5
-ascfile;
+ascfile;Vida_MP_GPA_K2368_2250V_950A_GC04XQ.asc
