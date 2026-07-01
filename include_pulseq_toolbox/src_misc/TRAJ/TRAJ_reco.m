@@ -181,7 +181,7 @@ if strcmp(PULSEQ.TRAJ.method, 'robison')
 end
 
 %% case: approximated projections
-if PULSEQ.TRAJ.flag_approx
+if isfield(PULSEQ.TRAJ, 'flag_approx') && PULSEQ.TRAJ.flag_approx
     rot_approx        = PULSEQ.TRAJ.rot;
     rot               = PULSEQ.PULSEQ_SPI.SPI.rot;
     phi_approx        = PULSEQ.TRAJ.phi_approx';
