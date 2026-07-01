@@ -180,6 +180,29 @@ if strcmp(PULSEQ.TRAJ.method, 'robison')
     
 end
 
+%% case: approximated projections
+if PULSEQ.TRAJ.flag_approx
+    rot_approx        = PULSEQ.TRAJ.rot;
+    rot               = PULSEQ.PULSEQ_SPI.SPI.rot;
+    phi_approx        = PULSEQ.TRAJ.phi_approx';
+    phi               = PULSEQ.PULSEQ_SPI.SPI.proj.phi_unique(:);
+    NR                = size(rot,1);
+    ktraj_meas_approx = ktraj_meas;
+    ktraj_meas        = zeros(size(ktraj_meas,1), NR, size(ktraj_meas,3));
+    dphi              = abs(angle(exp(1i*(phi(:) - phi_approx(:).'))));    
+    [~, idx]          = min(dphi, [], 2);    
+    for j = 1:NR
+        temp_k = [squeeze(ktraj_meas_approx(1, idx(j), :)), squeeze(ktraj_meas_approx(2, idx(j), :)), zeros(size(ktraj_meas_approx,3),1)];
+        temp_k = ( inv(mr.aux.quat.toRotMat(rot_approx(idx(j)).rotQuaternion)) * temp_k' )';
+        temp_k = ( mr.aux.quat.toRotMat(rot(j).rotQuaternion) * temp_k' )';
+        ktraj_meas(1,j,:) = temp_k(:,1);
+        ktraj_meas(2,j,:) = temp_k(:,2);
+    end
+    ktraj_meas_x = squeeze(ktraj_meas(1,:,:));
+    ktraj_meas_y = squeeze(ktraj_meas(2,:,:));
+    clear rot_approx rot phi_approx phi ktraj_meas_approx dphi idx temp_k j;
+end
+
 %% load calculated trajectory -> generate hash ID
 ktraj_calc   = SPI_load_ktraj(PULSEQ.PULSEQ_SPI);
 ktraj_hash   = pulseq_get_wave_hash(ktraj_calc(:));
@@ -274,7 +297,7 @@ axis image;
 set(gca,'linewidth', 2, 'fontsize', 12, 'fontname', 'arial', 'fontweight', 'bold')
 
 % eddy currents
-if strcmp(PULSEQ.TRAJ.method, 'robison')
+if strcmp(PULSEQ.TRAJ.method, 'robison') && ~PULSEQ.TRAJ.flag_approx
 figure()
 tiledlayout(2,1)
 ax1 = nexttile;
