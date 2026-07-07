@@ -61,6 +61,21 @@ MRF.FA_min = 4 *pi/180;                  % [rad] minimum flip angle
 MRF.FA_max = 15 *pi/180;                 % [rad] minimum flip angle
 MRF.FAs    = MRF_calc_FAs_sin_rand(MRF.FA_min, MRF.FA_max, MRF.nr, MRF.n_segm);
 
+%% params: MRF segment timings and trigger options
+
+MRF.mode_seg = 'trigger'; % 'trigger', 'constant', 'variable'
+
+switch MRF.mode_seg
+    case 'trigger' % -> cardiac MRF        
+        % this will enable the cardiac trigger; segment timings will be synchronized; soft delays will be used for adjusting the acq window on the scanner
+
+    case 'constant' % -> constant segment durations (use e.g. for phantom validations or abdominal scans)
+        MRF.seg_duration = 1000 *1e-3; % [s] all segments will have the same total duration including readouts; this example would emulate a 1000ms RR interval
+
+    case 'variable' % -> variable recovery times (use e.g. for abdominal scans)
+        MRF.rec_times = rand(MRF.n_segm, 1); % [s] segments can have different durations; choose a specific recovery time for each segment
+end
+
 %% params: Spiral Readouts
 
 % basic/import params for MRF
@@ -152,29 +167,9 @@ SL = SL_init(SL, FOV, system);
 FAT.mode = 'on';
 FAT = FAT_init(FAT, FOV, system);
 
-%% check MRF encoding params
+%% check MRF encoding params and adjust segment delays
 MRF_check_enc_list();
-
-%% adjust dynamic segment delays
 MRF_adjust_segment_delays();
-
-%% Trigger Mode
-% on:  Cardiac
-% off: Abdominal or Phantom
-
-MRF.mode_trig = 'on';
-
-% calc fixed segment timings
-MRF.acq_duration      = sum(SPI.TR(1:MRF.nr));
-MRF.prep_acq_duration = MRF.prep_max + MRF.acq_duration;
-
-if strcmp(MRF.mode_trig, 'on')
-    MRF.delay_soft = mr.makeSoftDelay(0, 'acq_end', 'offset', -MRF.prep_acq_duration, 'factor', 1); % block_duration [s] = offset [s] + input [s] / factor
-    TRIG_IN = mr.makeTrigger('physio1', 'system', system, 'delay', 10e-6, 'duration', 10e-3); % Input Trigger
-else
-    MRF.seg_duration = 1000 *1e-3; % [s] adjust segment duration
-    MRF.delay_soft   = mr.makeDelay( round((MRF.seg_duration-MRF.prep_acq_duration)/system.gradRasterTime)*system.gradRasterTime ); % fixed delay
-end
 
 %% noise pre-scans
 SPI.Nnoise = 16;

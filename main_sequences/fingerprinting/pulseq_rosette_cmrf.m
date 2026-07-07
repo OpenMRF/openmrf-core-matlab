@@ -1,6 +1,6 @@
 %% init pulseq
 clear
-seq_name = 'rosette_cmrf';
+seq_name = 'rosette_CMRF';
 
 % main flags
 flag_backup = 0; % 0: off,  1: only backup,  2: backup and send .seq
@@ -8,10 +8,10 @@ flag_report = 0; % 0: off,  1: only timings, 2: full report (slow)
 flag_pns    = 0; % 0: off,  1: simulate PNS stimulation
 
 % optional: select scanner
-% pulseq_scanner = 'Siemens_Sola_1,5T_MIITT';
+pulseq_scanner = 'Siemens_Vida_3T_MIITT';
 
 % optional: select pns sim orientation
-% pns_orientation = 'coronal';
+pns_orientation = 'all';
 
 % init system, seq object and load pulseq user information
 pulseq_init();
@@ -32,47 +32,54 @@ FOV_init();
 % 'SL'         ->  use for T1p encoding
 % 'MLEV'       ->  use for T2 or T2p encoding
 
-MRF.enc_list = { % the following encoding list is only an example which includes all possible preparations
-'Inversion';
-'No_Prep';
-'T2';
-'T2';
-'Inversion';
-'Saturation';
-'SL';
-'SL';
-'Inversion';
-'Saturation';
-'No_Prep';
-'No_Prep';
-'Inversion';
-'No_Prep';
-'MLEV';
-'MLEV'
+MRF.enc_list = {
+'Inversion'
+'No_Prep'
+'No_Prep'
+'T2'
+'T2'
+'T2'
+'T2'
+'T2'
+'No_Prep'
+'T2'
+'No_Prep'
+'Inversion'
+'No_Prep'
+'No_Prep'
+'T2'
 };
 
 MRF.n_segm = numel(MRF.enc_list);
 
 %% params: MRF flipangles and repetition times
-MRF.nr     = 32;                         % numer of readouts per hear beat
+MRF.nr     = 25;                         % numer of readouts per hear beat
 MRF.NR     = MRF.n_segm * MRF.nr;        % total number of readouts
 MRF.TRs    = 0.0 *1e-3 *ones(MRF.NR,1);  % minimize TRs
 MRF.FA_min = 4 *pi/180;                  % [rad] minimum flip angle
 MRF.FA_max = 15 *pi/180;                 % [rad] minimum flip angle
 MRF.FAs    = MRF_calc_FAs_sin_rand(MRF.FA_min, MRF.FA_max, MRF.nr, MRF.n_segm);
 
-% or use constant FAs
-% MRF.FAs = 15*pi/180 * ones(MRF.NR,1);
+%% params: MRF segment timings and trigger options
 
-% or import from .mat file
-% load('FAs.mat');
-% MRF.FAs = FAs;
+MRF.mode_seg = 'trigger'; % 'trigger', 'constant', 'variable'
+
+switch MRF.mode_seg
+    case 'trigger' % -> cardiac MRF        
+        % this will enable the cardiac trigger; segment timings will be synchronized; soft delays will be used for adjusting the acq window on the scanner
+
+    case 'constant' % -> constant segment durations (use e.g. for phantom validations or abdominal scans)
+        MRF.seg_duration = 1000 *1e-3; % [s] all segments will have the same total duration including readouts; this example would emulate a 1000ms RR interval
+
+    case 'variable' % -> variable recovery times (use e.g. for abdominal scans)
+        MRF.rec_times = rand(MRF.n_segm, 1); % [s] segments can have different durations; choose a specific recovery time for each segment
+end
 
 %% params: Spiral Readouts
 
 % basic/import params for MRF
 SPI.mode_2D_3D     = '2D';      % '2D', '3D' or '3D_stacked'
-SPI.adcBW          = 400 *1e3;  % [Hz] desired receiver bandwidth
+SPI.adcBW          = 500 *1e3;  % [Hz] desired receiver bandwidth
 SPI.NR             = MRF.NR;    % [ ] number of repetitions
 SPI.nr             = MRF.nr;    % [ ] numer of readouts per hear beat
 SPI.mrf_import.TRs = MRF.TRs;   % [s] repetition times
@@ -84,33 +91,33 @@ SPI.exc_shape     = 'ex';        % only for sigpy: 'st' or 'ex'
 SPI.exc_time      = 0.8 *1e-3;   % [s] excitation time
 SPI.exc_tbw       = 2;           % [ ] time bandwidth product
 SPI.exc_fa_mode   = 'import';    % 'equal',  'ramped',  'import'  
-SPI.reph_duration = 0.6 *1e-3;   % [s] slice rephaser duration
+SPI.reph_duration = 0.3 *1e-3;   % [s] slice rephaser duration
 
 % params: gradient spoiling & rf spoiling
 SPI.spoil_nTwist   = 4 * FOV.Nz;  % [ ] number of 2pi twist in slice
 SPI.spoil_rf_mode  = 'lin';       % 'lin' or 'quad'
 SPI.spoil_rf_inc   = 0 *pi/180;   % [rad] rf phase increment
-SPI.spoil_duration = 1.0 *1e-3;   % [s] slice spoiler duration
+SPI.spoil_duration = 0.5 *1e-3;   % [s] slice spoiler duration
 
 % k-space geometry params
 SPI.geo.design  = 'rosette';
-SPI.geo.N_lobes = 17;
+SPI.geo.N_lobes = 7;
 SPI.geo.Ns      = 1e5;
 SPI.geo.ds      = 1e-3;
 SPI.geo.flag_rv = 0;
 
 % gradient & slew rate limitation factors
-SPI.lim_exc_slew   = 0.9; % slice excitation
-SPI.lim_reph_grad  = 0.9; % slice rephasing
-SPI.lim_reph_slew  = 0.6; % slice rephasing
-SPI.lim_read_grad  = 0.9; % readout
-SPI.lim_read_slew  = 0.81; % readout
-SPI.lim_spoil_grad = 0.9; % slice spoiling
-SPI.lim_spoil_slew = 0.6; % slice spoiling
+SPI.lim_exc_slew   = 0.95;   % slice excitation
+SPI.lim_reph_grad  = 0.95;   % slice rephasing
+SPI.lim_reph_slew  = 0.95;   % slice rephasing
+SPI.lim_read_grad  = 0.5;    % readout
+SPI.lim_read_slew  = 0.375;  % readout
+SPI.lim_spoil_grad = 0.95;   % slice spoiling
+SPI.lim_spoil_slew = 0.95;   % slice spoiling
 
 % k-space projection params
 SPI.proj.mode = 'RoundGoldenAngle'; % 'Equal2Pi' 'RoundGoldenAngle'
-SPI.proj.Nid  = 48; % number of unique projections
+SPI.proj.Nid  = 179; % number of unique projections
 
 % visulize trajectory and fat suppression
 SPI.geo.flag_plot = 1;
@@ -123,73 +130,30 @@ INV.rf_type      = 'HYPSEC_inversion';
 INV.tExc         = 10 *1e-3;  % [s]  hypsech pulse duration
 INV.beta         = 700;       % [Hz] maximum rf peak amplitude
 INV.mu           = 4.9;       % [ ]  determines amplitude of frequency sweep
-INV.inv_rec_time = [15 75 150 250] *1e-3;
+INV.inv_rec_time = [340 340] *1e-3;
+INV.crush_nTwist = 24.5;      % [ ] number of 2pi twists in read/phase/slice direction of voxel
 INV = INV_init(INV, FOV, system);
 
 %% params: T2 preparation
-T2.exc_mode   = 'adiabatic_BIR4';
-T2.rfc_dur    = 2 *1e-3;   % [s]  duration of composite refocusing pulses
-T2.bir4_tau   = 10 *1e-3;  % [s]  bir4 pulse duration
-T2.bir4_f1    = 640;       % [Hz] maximum rf peak amplitude
-T2.bir4_beta  = 10;        % [ ]  am waveform parameter
-T2.bir4_kappa = atan(10);  % [ ]  fm waveform parameter
-T2.bir4_dw0   = 30000;     % [rad/s] fm waveform scaling
-T2.prep_times = [40 80] * 1e-3;  % [s] inversion times
-T2            = T2_init(T2, FOV, system);
-
-%% params: Spin-Lock
-
-% spin-lock pulses
-SL.relax_type = {'T1p'};         % T1p or T2p or T2
-SL.seq_type   = {'BSL'};         % BSL or CSL or RESL
-SL.tSL        = [40 80] *1e-3;   % [s]  SL time
-SL.fSL        = [200 200];       % [Hz] SL amplitude
-
-% excitation pulses
-SL.exc_mode  = 'adiabatic_AHP';  % 'adiabatic_AHP', 'sinc', 'sigpy_SLR' or 'bp'
-SL.exc_time  = 3.0 *1e-3;        % [s] excitation time
-SL.adia_wmax = 600 * 2*pi;       % [rad/s] amplitude of adiabatic pulse
-
-% refocusing pulses
-SL.rfc_mode = 'bp';              % 'bp', 'sinc', 'sigpy_SLR' or 'comp'
-SL.rfc_time = 1.0 *1e-3;         % [s] refocusing time
-
-SL = SL_init(SL, FOV, system);
-
-%% params: MLEV T2p preparation
-MLEV.n_mlev   = [4 8];           % number of MLEV4 preps
-MLEV.fSL      = 250;             % [Hz] eff spin-lock field strength
-MLEV.t_inter  = 1 *1e-5;         % [s]  inter pulse delay for T2 preparation
-MLEV.exc_mode = 'adiabatic_AHP'; % 'adiabatic_BIR4' or 'adiabatic_AHP'
-MLEV = MLEV_init(MLEV, FOV, system);
+T2.exc_mode      = 'adiabatic_BIR4';
+T2.rfc_dur       = 2 *1e-3;   % [s]  duration of composite refocusing pulses
+T2.bir4_tau      = 10 *1e-3;  % [s]  bir4 pulse duration
+T2.bir4_f1       = 640;       % [Hz] maximum rf peak amplitude
+T2.bir4_beta     = 10;        % [ ]  am waveform parameter
+T2.bir4_kappa    = atan(10);  % [ ]  fm waveform parameter
+T2.bir4_dw0      = 30000;     % [rad/s] fm waveform scaling
+T2.prep_times    = [40 80 70 40 80 60 40] * 1e-3;  % [s] inversion times
+T2.crush_nTwists = 16.4;      % [ ] number of 2pi twists in read/phase/slice direction of voxel
+T2.crush_dur     = 6 *1e-3;   % [s]  spoiler pulse duration
+T2 = T2_init(T2, FOV, system);
 
 %% params: Fat Saturation
-FAT.mode = 'on';
+FAT.mode = 'off';
 FAT = FAT_init(FAT, FOV, system);
 
-%% check MRF encoding params
+%% check MRF encoding params and adjust segment delays
 MRF_check_enc_list();
-
-%% adjust dynamic segment delays
 MRF_adjust_segment_delays();
-
-%% Trigger Mode
-% on:  Cardiac
-% off: Abdominal or Phantom
-
-MRF.mode_trig = 'off';
-
-% calc fixed segment timings
-MRF.acq_duration      = sum(SPI.TR(1:MRF.nr));
-MRF.prep_acq_duration = MRF.prep_max + MRF.acq_duration;
-
-if strcmp(MRF.mode_trig, 'on')
-    MRF.delay_soft = mr.makeSoftDelay(0, 'acq_end', 'offset', -MRF.prep_acq_duration, 'factor', 1); % block_duration [s] = offset [s] + input [s] / factor
-    TRIG_IN = mr.makeTrigger('physio1', 'system', system, 'delay', 10e-6, 'duration', 10e-3); % Input Trigger
-else
-    MRF.seg_duration = 1000 *1e-3; % [s] adjust segment duration
-    MRF.delay_soft   = mr.makeDelay( round((MRF.seg_duration-MRF.prep_acq_duration)/system.gradRasterTime)*system.gradRasterTime ); % fixed delay
-end
 
 %% noise pre-scans
 SPI.Nnoise = 16;

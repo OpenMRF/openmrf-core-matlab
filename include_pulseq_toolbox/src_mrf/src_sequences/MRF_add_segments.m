@@ -1,4 +1,4 @@
-% Author: Maximilian Gram, University Hospital Wuerzburg, Wuerzburg, Germany; V1, 09.03.2026
+% Author: Maximilian Gram, University Hospital Wuerzburg, Wuerzburg, Germany; V2, 06.07.2026
 
 %% add sequence objects for cardio or abdominal MRF
 
@@ -19,17 +19,15 @@ for loop_MRF = 1 : MRF.n_segm
     seq.addTRID(['CMRF_' num2str(loop_MRF) '_' MRF.enc_list{loop_MRF}]);
  
     % Trigger: R-Wave
-    if exist('TRIG_IN', 'var')
+    if ~isempty(TRIG_IN)
         seq.addBlock(TRIG_IN);   
     end
 
-    % Soft Delay and Dynamic Delay after Trigger (adjust cardiac phase)
-    if strcmp(MRF.delay_soft.type, 'softDelay')
-        seq.addBlock(system.gradRasterTime, MRF.delay_soft);
-        seq.addBlock(MRF.delay_dynamic(loop_MRF));
-    else
-        seq.addBlock(mr.makeDelay(mr.calcDuration(MRF.delay_soft) + mr.calcDuration(MRF.delay_dynamic(loop_MRF))));
-    end    
+    % Soft Delay and Dynamic Delay: adjust cardiac phase or set individual recovery times
+    if ~isempty(MRF.delay_soft)
+        seq.addBlock(system.blockDurationRaster, MRF.delay_soft);
+    end
+    seq.addBlock(MRF.delay_dynamic(loop_MRF));   
 
     % MRF Preparations:
     MRF_add_preparation();
