@@ -1,3 +1,6 @@
 *.asv
 *.asc
 *.db
+
+# generated silver-dictionary records (regenerate via demo_silver_record.m)
+silver_records/
