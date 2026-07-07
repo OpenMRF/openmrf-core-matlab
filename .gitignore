@@ -1,3 +1,5 @@
 *.asv
 *.asc
 *.db
+bench_mrf_generation_*.csv
+bench_mrf_generation_*.mat
