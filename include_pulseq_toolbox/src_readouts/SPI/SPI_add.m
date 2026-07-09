@@ -7,8 +7,9 @@
 
 % ----- sequence loop counter: -----
 % loop_rf_inc -> rf spoiling
-% loop_kz -> z partitions
-% loop_NR -> repetitions
+% loop_kz     -> z partitions
+% loop_NR     -> repetitions
+% loop_skope  -> skope segments
 
 %% init loop counters
 if ~exist('loop_rf_inc', 'var')
@@ -21,6 +22,9 @@ if loop_NR<1
     temp_loop = 1;
 else
     temp_loop = loop_NR;
+end
+if ~exist('loop_skope', 'var')
+    loop_skope = [];
 end
 
 %% rf spoilng
@@ -46,9 +50,20 @@ if flag_UI==1
 end
 
 %% add sequence blocks
-seq.addTRID('spiral_slice_excitation');
-seq.addBlock(SPI.rf(temp_loop), SPI.gz_exc);
-seq.addBlock(SPI.gz_reph(loop_kz));
+if ~SPI.skope.flag_onoff
+    seq.addTRID('spiral_slice_excitation');
+    seq.addBlock(SPI.rf(temp_loop), SPI.gz_exc);
+    seq.addBlock(SPI.gz_reph(loop_kz));
+else
+    if ismember(loop_NR, SPI.skope.TR_list(:, loop_skope))
+        seq.addTRID('skope_acquisition');
+        seq.addBlock(SPI.skope.delay, SPI.skope.trig_out);
+    else
+        seq.addTRID('skope_dummy');
+        seq.addBlock(SPI.gz_exc);
+        seq.addBlock(SPI.gz_reph(loop_kz));
+    end
+end
 seq.addBlock(SPI.TE_delay(temp_loop));
 if loop_NR<1
     seq.addTRID('spiral_dummy');

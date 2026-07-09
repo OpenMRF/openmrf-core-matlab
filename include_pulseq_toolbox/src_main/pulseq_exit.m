@@ -106,6 +106,14 @@ if flag_sound==1
     seq.sound();
 end
 
+%% set sequence definitions for Skope field camera
+if exist('SPI', 'var') && isfield(SPI , 'skope') && SPI.skope.flag_onoff
+    seq.setDefinition('CameraAcqDuration',  mr.calcDuration(SPI.adc) + 2e-3);
+    seq.setDefinition('CameraNrDynamics',   sum(~isnan(SPI.skope.TR_list(:))));
+    seq.setDefinition('CameraInterleaveTR', 0.1);
+    seq.setDefinition('CameraAqDelay',     0);
+end
+
 %% write .seq file and save some backup files
 if flag_backup>0
 
