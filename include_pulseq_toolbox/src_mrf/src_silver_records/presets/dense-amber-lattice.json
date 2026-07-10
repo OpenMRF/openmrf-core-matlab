@@ -1,0 +1,22 @@
+{
+  "preset_schema": "openmrf.silver.preset/1",
+  "name": "dense-amber-lattice",
+  "title": "IR-FISP, Yun 1000-TR, dense log-grid tissues",
+  "description": "Inversion-recovery FISP on the Yun 1000-TR pattern, but over a systematic log-spaced (T1,T2) grid (T2<T1) instead of named tissues, for broad parameter-space coverage.",
+  "sequence": "irfisp_t2prep_ideal",
+  "pattern": { "source": "named", "name": "yun" },
+  "tissues": {
+    "mode": "grid",
+    "grid": {
+      "T1": { "range": [0.2, 3.0], "factor": 1.5 },
+      "T2": { "range": [0.02, 0.6], "factor": 1.5 },
+      "constraints": ["T2<T1"]
+    }
+  },
+  "options": {
+    "TE": 0.002,
+    "spoil_twists": 1,
+    "t2_nrefocus": 2,
+    "prep": [ ["inv", 0.02] ]
+  }
+}
