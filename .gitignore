@@ -1,5 +1,10 @@
 *.asv
 *.asc
 *.db
+
+# benchmark output wildcards
 bench_mrf_generation_*.csv
 bench_mrf_generation_*.mat
+
+# generated silver-dictionary records (regenerate via demo_silver_record.m)
+silver_records/

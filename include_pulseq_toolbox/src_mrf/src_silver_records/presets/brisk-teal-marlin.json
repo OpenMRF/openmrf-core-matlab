@@ -1,0 +1,15 @@
+{
+  "preset_schema": "openmrf.silver.preset/1",
+  "name": "brisk-teal-marlin",
+  "title": "IR + mid-train T2-prep, Yun 1000-TR, named tissues",
+  "description": "Inversion recovery at the start of the Yun 1000-TR train plus a T2 preparation (tau = 60 ms) spliced in before readout 500, exercising the place-prep-anywhere feature and T2 weighting in a reference record.",
+  "sequence": "irfisp_t2prep_ideal",
+  "pattern": { "source": "named", "name": "yun" },
+  "tissues": { "mode": "named", "names": [] },
+  "options": {
+    "TE": 0.002,
+    "spoil_twists": 1,
+    "t2_nrefocus": 2,
+    "prep": [ ["inv", 0.02], ["t2", 0.06, 500] ]
+  }
+}

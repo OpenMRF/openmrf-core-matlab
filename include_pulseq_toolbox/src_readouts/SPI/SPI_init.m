@@ -23,6 +23,7 @@ function [SPI, ktraj_ref] = SPI_init(SPI, FOV, system, flag_plot)
 % calculate projection angles and rotation events
 % calculate slice spoiler or combined rewinder gradients
 % set rf spoiling
+% calculate Skope field cam objects
 % adapt timings for TRs and TEs
 % export reference k-space trajectory for reconstruction
 % -------------------------------------------------------------------
@@ -457,6 +458,31 @@ switch SPI.spoil_rf_mode
         SPI.spoil_rf_pow = []; 
     otherwise
         error('unknown rf spoiling mode!')
+end
+
+%% calculate Skope field cam objects
+if isfield(SPI, 'skope') && isfield(SPI.skope, 'n_seg') && SPI.skope.flag_onoff
+    SPI.skope.TR_list = reshape([1:SPI.NR nan(1,ceil(SPI.NR/SPI.skope.n_seg)*SPI.skope.n_seg-SPI.NR)], SPI.skope.n_seg, []).';
+    if any(SPI.skope.TR_list(:)<1) || any(SPI.skope.TR_list(:)>SPI.NR)
+        error('SPI.skope.TR_list is incompatible with number of spirals!');
+    end
+    if ~isfield(SPI.skope, 'ttl_dur')
+        SPI.skope.ttl_dur = 10e-6;
+    end
+    if ~isfield(SPI.skope, 'grad_free_dur')
+        SPI.skope.grad_free_dur = 300e-6;
+    end
+    SPI.skope.ttl_dur       = ceil(SPI.skope.ttl_dur/system.blockDurationRaster)       * system.blockDurationRaster;
+    SPI.skope.grad_free_dur = ceil(SPI.skope.grad_free_dur/system.blockDurationRaster) * system.blockDurationRaster;
+    if SPI.skope.grad_free_dur < SPI.skope.ttl_dur
+        SPI.skope.grad_free_dur = SPI.skope.ttl_dur;
+    end
+    SPI.skope.delay    = mr.calcDuration(SPI.rf(1), SPI.gz_exc) + mr.calcDuration(SPI.gz_reph(1));
+    SPI.skope.trig_out = mr.makeDigitalOutputPulse('ext1', 'duration', SPI.skope.ttl_dur, 'delay', SPI.skope.delay - SPI.skope.grad_free_dur - SPI.skope.ttl_dur);
+    SPI.skope.delay    = mr.makeDelay(SPI.skope.delay);
+else
+    SPI.skope = [];
+    SPI.skope.flag_onoff = false;
 end
 
 %% adapt timings for TRs and TEs
