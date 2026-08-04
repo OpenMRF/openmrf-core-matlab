@@ -39,7 +39,7 @@ MRF.acq_durations      = sum(reshape(SPI.TR, [MRF.nr, MRF.n_segm]))';
 MRF.prep_acq_durations = MRF.prep_durations + MRF.acq_durations;
 
 if ~isfield(MRF, 'mode_seg')
-    MRF.mode_trig = '';
+    MRF.mode_seg = '';
 end
 
 switch MRF.mode_seg

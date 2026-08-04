@@ -322,6 +322,6 @@ T1p = T1p + m1p * abs(wSL) * 1e-6 / 2 / pi; % m1p -> [ms/kHz]
 Q = Q * exp(-tSL/T1p);
 
 % simulate spin-lock-rotation
-Q = sim_rf(Q, abs(wSL), angle(wSL));
+Q = sim_rf(Q, abs(wSL)*tSL, angle(wSL));
 
 end

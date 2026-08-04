@@ -1,8 +1,8 @@
 B0;3.0
 gamma;4.257747851783256e+07
-maxGrad;43
+maxGrad;32
 gradUnit;mT/m
-maxSlew;180
+maxSlew;160
 slewUnit;T/m/s
 maxB1;20
 rfDeadTime;1e-4

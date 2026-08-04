@@ -25,7 +25,7 @@ cfg.dt            = 1e-6;                     % [s]  simulation raster time
 
 cfg.backends      = {'EPG', 'BLOCH'};        % use {'EPG'} for the lightest run
 cfg.N_iso         = 200;                      % isochromats for the BLOCH backend
-cfg.N_dict_sweep  = [1 10 100 1000 10000];    % dictionary sizes for the scaling sweep
+cfg.N_dict_sweep  = [1 10 100 1000];    % dictionary sizes for the scaling sweep
 cfg.N_dict_sat    = struct('EPG', 5e4, ...    % large "saturated" dict, per backend
                            'BLOCH', 1e4);     %   (pool mode only; BLOCH is slower)
 
