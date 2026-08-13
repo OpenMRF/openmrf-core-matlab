@@ -53,9 +53,9 @@ elseif strcmp(SL.seq_type(loop_SL), 'TBSL')
     seq.addBlock(sl1);    seq.addBlock(d1);
     seq.addBlock(rfc1);   seq.addBlock(d1);
     seq.addBlock(sl2);    seq.addBlock(d1);
-    seq.addBlock(sl1);    seq.addBlock(d1);
-    seq.addBlock(rfc2);   seq.addBlock(d1);
     seq.addBlock(sl2);    seq.addBlock(d1);
+    seq.addBlock(rfc2);   seq.addBlock(d1);
+    seq.addBlock(sl1);    seq.addBlock(d1);
 
 elseif strcmp(SL.seq_type(loop_SL), 'BSL')
     seq.addBlock(sl1);    seq.addBlock(d1);
