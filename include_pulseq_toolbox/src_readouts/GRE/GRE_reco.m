@@ -90,34 +90,39 @@ end
 % ifft
 Images_coils = kspace2image(kSpace_raw);
 
-% calculate cmaps
-if isempty(cmaps)
-    if NImages==1
-        temp = squeeze(Images_coils);
-    else
-        temp = squeeze(mean(Images_coils));
-    end
-    if mod_reco==1
-        [~, cmaps] = openadapt(temp);    
-    end
-    if mod_reco==2
-        cmaps = mg_espirit_cmaps(temp, 0.02, 0.95, 24, [6,6]);
-    end
-    clear temp;
-end
-
-% calculate coil combined images
-Images = zeros(NImages, Ny, Nx);
-for j=1:NImages
-    if mod_reco == 0
-        temp          = squeeze(Images_coils(j,:,:,:));
-        temp          = squeeze(sqrt(sum(abs(temp).^2,1)));
-        Images(j,:,:) = temp(:,:);
+if NCoils > 1
+    % calculate cmaps
+    if isempty(cmaps)
+        if NImages==1
+            temp = squeeze(Images_coils);
+        else
+            temp = squeeze(mean(Images_coils));
+        end
+        if mod_reco==1
+            [~, cmaps] = openadapt(temp);    
+        end
+        if mod_reco==2
+            cmaps = mg_espirit_cmaps(temp, 0.02, 0.95, 24, [6,6]);
+        end
         clear temp;
-    end    
-    if mod_reco>1   
-        Images(j,:,:) = squeeze(sum( squeeze(Images_coils(j,:,:,:)) .* conj(cmaps) ));
-    end    
+    end
+    
+    % calculate coil combined images
+    Images = zeros(NImages, Ny, Nx);
+    for j=1:NImages
+        if mod_reco == 0
+            temp          = squeeze(Images_coils(j,:,:,:));
+            temp          = squeeze(sqrt(sum(abs(temp).^2,1)));
+            Images(j,:,:) = temp(:,:);
+            clear temp;
+        end    
+        if mod_reco>1   
+            Images(j,:,:) = squeeze(sum( squeeze(Images_coils(j,:,:,:)) .* conj(cmaps) ));
+        end    
+    end
+else
+    cmaps = [];
+    Images = squeeze(Images_coils);
 end
 
 %% zero filling

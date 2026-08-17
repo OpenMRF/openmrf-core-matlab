@@ -104,35 +104,52 @@ dcf2D      = mg_get_heatmap( kx, ky, dcf, 2 );
 
 %% calculate nonuniform fast fourier transform: NUFFT
 images_coils = zeros(NImages, NCoils, Nxy, Nxy);
-parfor j = 1:NImages
-    temp_k                = squeeze(rawdata2(:,j,:));
-    temp_reco             = permute( nufft_adj( temp_k.' .* repmat(dcf, [1, NCoils]), nufft_st ), [3, 1, 2]);
-    images_coils(j,:,:,:) = temp_reco(:,:,:);
+if NCoils > 1
+    parfor j = 1:NImages
+        temp_k                = squeeze(rawdata2(:,j,:));
+        temp_reco             = permute( nufft_adj( temp_k.' .* repmat(dcf, [1, NCoils]), nufft_st ), [3, 1, 2]);
+        images_coils(j,:,:,:) = temp_reco(:,:,:);
+    end
+else
+    parfor j = 1:NImages
+        temp_k                = squeeze(rawdata2(:,j,:));
+        temp_reco             = nufft_adj( temp_k .* dcf, nufft_st );
+        images_coils(j,:,:,:) = temp_reco(:,:);
+    end
 end
 
 %% calculate coil sensitivity maps: cmaps
-if isempty(cmaps)
-    if mod_reco==1
-        if NImages>1
-            [~, cmaps] = openadapt(squeeze(mean(images_coils)));
-        else
-            [~, cmaps] = openadapt(squeeze(images_coils));
+if NCoils > 1
+    if isempty(cmaps)
+        if mod_reco==1
+            if NImages>1
+                [~, cmaps] = openadapt(squeeze(mean(images_coils)));
+            else
+                [~, cmaps] = openadapt(squeeze(images_coils));
+            end
+        end
+        if mod_reco==2
+            if NImages>1
+                cmaps = mg_espirit_cmaps(squeeze(mean(images_coils)), 0.02, 0.95, 24, [6,6]);
+            else
+                cmaps = mg_espirit_cmaps(squeeze(images_coils), 0.02, 0.95, 24, [6,6]);
+            end
         end
     end
-    if mod_reco==2
-        if NImages>1
-            cmaps = mg_espirit_cmaps(squeeze(mean(images_coils)), 0.02, 0.95, 24, [6,6]);
-        else
-            cmaps = mg_espirit_cmaps(squeeze(images_coils), 0.02, 0.95, 24, [6,6]);
-        end
-    end
+else
+    cmaps = [];
 end
 
 %% calculate coil combined images
-Images = zeros(NImages, Nxy, Nxy);
-for j=1:NImages 
-    Images(j,:,:) = squeeze(sum( squeeze(images_coils(j,:,:,:)) .* conj(cmaps) ));    
+if NCoils > 1
+    Images = zeros(NImages, Nxy, Nxy);
+    for j=1:NImages 
+        Images(j,:,:) = squeeze(sum( squeeze(images_coils(j,:,:,:)) .* conj(cmaps) ));    
+    end
+else
+    Images = squeeze(images_coils);
 end
+
 
 %% zero interpolation filling
 if zero_params.onoff == 1

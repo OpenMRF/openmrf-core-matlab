@@ -102,45 +102,48 @@ if strcmp(PULSEQ.TRAJ.method, 'robison')
     rawdata_y3 = squeeze(mean(reshape(rawdata_y3, NCoils, Nav, [], NRead), 2));
     rawdata_y4 = squeeze(mean(reshape(rawdata_y4, NCoils, Nav, [], NRead), 2));
 
-    % PCA coil compression: x slice
-    rawdata_x1 = rawdata_x1(:,:);
-    rawdata_x2 = rawdata_x2(:,:);
-    rawdata_x3 = rawdata_x3(:,:);
-    rawdata_x4 = rawdata_x4(:,:);
-    [~, ~, pc] = svd([rawdata_x1, rawdata_x2, rawdata_x3, rawdata_x4].', 'econ');
-    rawdata_x1 = pc.' * rawdata_x1(:,:);
-    rawdata_x2 = pc.' * rawdata_x2(:,:);
-    rawdata_x3 = pc.' * rawdata_x3(:,:);
-    rawdata_x4 = pc.' * rawdata_x4(:,:);
-    rawdata_x1 = reshape(rawdata_x1, [NCoils NR NRead] );
-    rawdata_x2 = reshape(rawdata_x2, [NCoils NR NRead] );
-    rawdata_x3 = reshape(rawdata_x3, [NCoils NR NRead] );
-    rawdata_x4 = reshape(rawdata_x4, [NCoils NR NRead] );
-    rawdata_x1 = squeeze(rawdata_x1(1,:,:));
-    rawdata_x2 = squeeze(rawdata_x2(1,:,:));
-    rawdata_x3 = squeeze(rawdata_x3(1,:,:));
-    rawdata_x4 = squeeze(rawdata_x4(1,:,:));
-    clear pc;
-
-    % PCA coil compression: y slice
-    rawdata_y1 = rawdata_y1(:,:);
-    rawdata_y2 = rawdata_y2(:,:);
-    rawdata_y3 = rawdata_y3(:,:);
-    rawdata_y4 = rawdata_y4(:,:);
-    [~, ~, pc] = svd([rawdata_y1, rawdata_y2, rawdata_y3, rawdata_y4].', 'econ');
-    rawdata_y1 = pc.' * rawdata_y1(:,:);
-    rawdata_y2 = pc.' * rawdata_y2(:,:);
-    rawdata_y3 = pc.' * rawdata_y3(:,:);
-    rawdata_y4 = pc.' * rawdata_y4(:,:);
-    rawdata_y1 = reshape(rawdata_y1, [NCoils NR NRead] );
-    rawdata_y2 = reshape(rawdata_y2, [NCoils NR NRead] );
-    rawdata_y3 = reshape(rawdata_y3, [NCoils NR NRead] );
-    rawdata_y4 = reshape(rawdata_y4, [NCoils NR NRead] );
-    rawdata_y1 = squeeze(rawdata_y1(1,:,:));
-    rawdata_y2 = squeeze(rawdata_y2(1,:,:));
-    rawdata_y3 = squeeze(rawdata_y3(1,:,:));
-    rawdata_y4 = squeeze(rawdata_y4(1,:,:));
-    clear pc;
+    
+    if NCoils > 1
+        % PCA coil compression: x slice
+        rawdata_x1 = rawdata_x1(:,:);
+        rawdata_x2 = rawdata_x2(:,:);
+        rawdata_x3 = rawdata_x3(:,:);
+        rawdata_x4 = rawdata_x4(:,:);
+        [~, ~, pc] = svd([rawdata_x1, rawdata_x2, rawdata_x3, rawdata_x4].', 'econ');
+        rawdata_x1 = pc.' * rawdata_x1(:,:);
+        rawdata_x2 = pc.' * rawdata_x2(:,:);
+        rawdata_x3 = pc.' * rawdata_x3(:,:);
+        rawdata_x4 = pc.' * rawdata_x4(:,:);
+        rawdata_x1 = reshape(rawdata_x1, [NCoils NR NRead] );
+        rawdata_x2 = reshape(rawdata_x2, [NCoils NR NRead] );
+        rawdata_x3 = reshape(rawdata_x3, [NCoils NR NRead] );
+        rawdata_x4 = reshape(rawdata_x4, [NCoils NR NRead] );
+        rawdata_x1 = squeeze(rawdata_x1(1,:,:));
+        rawdata_x2 = squeeze(rawdata_x2(1,:,:));
+        rawdata_x3 = squeeze(rawdata_x3(1,:,:));
+        rawdata_x4 = squeeze(rawdata_x4(1,:,:));
+        clear pc;
+    
+        % PCA coil compression: y slice
+        rawdata_y1 = rawdata_y1(:,:);
+        rawdata_y2 = rawdata_y2(:,:);
+        rawdata_y3 = rawdata_y3(:,:);
+        rawdata_y4 = rawdata_y4(:,:);
+        [~, ~, pc] = svd([rawdata_y1, rawdata_y2, rawdata_y3, rawdata_y4].', 'econ');
+        rawdata_y1 = pc.' * rawdata_y1(:,:);
+        rawdata_y2 = pc.' * rawdata_y2(:,:);
+        rawdata_y3 = pc.' * rawdata_y3(:,:);
+        rawdata_y4 = pc.' * rawdata_y4(:,:);
+        rawdata_y1 = reshape(rawdata_y1, [NCoils NR NRead] );
+        rawdata_y2 = reshape(rawdata_y2, [NCoils NR NRead] );
+        rawdata_y3 = reshape(rawdata_y3, [NCoils NR NRead] );
+        rawdata_y4 = reshape(rawdata_y4, [NCoils NR NRead] );
+        rawdata_y1 = squeeze(rawdata_y1(1,:,:));
+        rawdata_y2 = squeeze(rawdata_y2(1,:,:));
+        rawdata_y3 = squeeze(rawdata_y3(1,:,:));
+        rawdata_y4 = squeeze(rawdata_y4(1,:,:));
+        clear pc;
+    end
 
     % get phases using opposite slice positions
     rawdata_xA = rawdata_x1 .* conj(rawdata_x2);
