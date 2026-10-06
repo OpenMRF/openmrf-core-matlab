@@ -99,7 +99,18 @@ Original source: https://github.com/pehses/mapVBVD
 
 
 -------------------------------------------------------------------------------
-8. MRI Phantom Simulation Code
+8. ISMRM Raw Data Format (ISMRMRD)
+/include_misc/src_ismrmrd
+
+Project: ISMRM Raw Data Format (ISMRMRD)
+Original source: https://github.com/ismrmrd/ismrmrd
+License: ISMRMRD Software License (July 2013)
+Citation:
+Inati SJ, Naegele JD, Zwart NR, Roopchansingh V, Lizak MJ, Hansen DC, Liu CY, Atkinson D, Kellman P, Kozerke S, Xue H, Campbell-Washburn AE, Sørensen TS, Hansen MS. ISMRM Raw data format: A proposed standard for MRI raw datasets. Magn Reson Med. 2017 Jan;77(1):411-421. doi: 10.1002/mrm.26089
+
+
+-------------------------------------------------------------------------------
+9. MRI Phantom Simulation Code
 /include_misc/src_mri_phantom
 
 Original authors: Guerquin-Kern M, Lejeune L, Pruessmann KP, Unser M (EPFL Biomedical Imaging Group, École Polytechnique Fédérale de Lausanne, Switzerland)  
@@ -111,7 +122,7 @@ Guerquin-Kern M, Lejeune L, Pruessmann KP, Unser M. Realistic analytical phantom
 
 
 -------------------------------------------------------------------------------
-9. Prediction of PNS in Siemens MRI systems
+10. Prediction of PNS in Siemens MRI systems
 /include_misc/src_safe
 
 Original authors: Filip Szczepankiewicz and Thomas Witzel (Medical Radiation Physics Lund University, Sweden; Brigham and Women's Hospital, MA, Boston; Harvard Medical School, MA, Boston; Massachusetts General Hospital, MA, Boston)
@@ -123,7 +134,7 @@ SAFE-Model - A New Method for Predicting Peripheral Nerve Stimulations in MRI by
 
 
 -------------------------------------------------------------------------------
-10. A fast method for designing time-optimal gradient waveforms for arbitrary k-space trajectories
+11. A fast method for designing time-optimal gradient waveforms for arbitrary k-space trajectories
 /include_misc/src_tOptGrad
 
 Original authors: Lustig M, Kim SJ, Pauly JM, Vaziri S (UC Berkeley, Electrical Engineering & Computer Sciences, Berkeley, CA, USA)  
@@ -135,7 +146,7 @@ Vaziri S and Lustig M. The Fastest Arbitrary k-space Trajectories. Proc Intl Soc
 
 
 -------------------------------------------------------------------------------
-11. Variable-Density Spiral Design Functions
+12. Variable-Density Spiral Design Functions
 /include_misc/vds
 
 Original author: Brian Hargreaves (Stanford University, Stanford, CA, USA)  
@@ -145,7 +156,7 @@ Lee JH, Hargreaves BA, Hu BS, Nishimura DG. Fast 3D imaging using variable-densi
 
 
 -------------------------------------------------------------------------------
-12. Pulseq Framework
+13. Pulseq Framework
 /include_pulseq_master
 
 Original authors: Kelvin Layton, Maxim Zaitsev (University Medical Center Freiburg, Freiburg, Germany)
@@ -157,7 +168,7 @@ Layton KJ, Kroboth S, Jia F, Littin S, Yu H, Leupold J, Nielsen JF, Stöcker T, 
 
 
 -------------------------------------------------------------------------------
-13. Pulseq Toolbox Readout Modules
+14. Pulseq Toolbox Readout Modules
 /include_pulseq_toolbox/src_readouts
 
 Custom modules inspired by examples from:
