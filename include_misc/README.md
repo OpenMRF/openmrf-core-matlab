@@ -19,6 +19,11 @@ This folder contains auxiliary tools and libraries used in various parts of the 
   [Source](https://people.eecs.berkeley.edu/~mlustig/Software.html),  
   [Reference: Uecker et al., MRM 2013, doi:10.1002/mrm.24751](https://doi.org/10.1002/mrm.24751)
 
+- **src_ismrmrd**
+  MATLAB implementation of the [ISMRM Raw Data Format (ISMRMRD)](https://github.com/ismrmrd/ismrmrd). This folder contains the MATLAB components required for reading ISMRMRD HDF5 datasets in OpenMRF.  
+  [GitHub Repository](https://github.com/ismrmrd/ismrmrd),  
+  [Reference: Inati et al., MRM 2017, doi:10.1002/mrm.26089](https://doi.org/10.1002/mrm.26089)
+  
 - **src_mapVBVD**  
   Functions for reading Siemens rawdata (TWIX format).  
   [GitHub Repository](https://github.com/pehses/mapVBVD) by Philipp Ehses.
@@ -41,4 +46,4 @@ This folder contains auxiliary tools and libraries used in various parts of the 
 - **src_vds**  
   Variable-Density Spiral Design Functions by Brian Hargreaves: [VDS toolbox](http://mrsrl.stanford.edu/~brian/vdspiral/).
 
-_Maximilian Gram: 24.04.2026_
+_Maximilian Gram: 25.08.2026_
