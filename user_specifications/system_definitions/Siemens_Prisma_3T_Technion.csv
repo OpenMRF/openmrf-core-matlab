@@ -1,0 +1,15 @@
+B0;3.0
+gamma;4.257747851783256e+07
+maxGrad;80
+gradUnit;mT/m
+maxSlew;200
+slewUnit;T/m/s
+maxB1;20
+rfDeadTime;1e-4
+rfRingdownTime;1e-4
+adcDeadTime;1e-5
+adcRasterTime;1e-7
+rfRasterTime;1e-6
+gradRasterTime;1e-5
+blockDurationRaster;1e-5
+ascfile;Prisma_MP_GPA_K2309_2250V_951A_AS82.asc
