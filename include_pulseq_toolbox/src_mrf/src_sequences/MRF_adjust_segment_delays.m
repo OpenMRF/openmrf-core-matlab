@@ -47,7 +47,7 @@ switch MRF.mode_seg
         MRF.mode_trig    = 'on';
         MRF.seg_duration = [];
         MRF.rec_times    = [];
-        TRIG_IN          = mr.makeTrigger('physio1', 'system', system, 'duration', system.blockDurationRaster); % ECG input trigger
+        TRIG_IN          = mr.makeTrigger('physio1', 'system', system, 'duration', 10*system.blockDurationRaster, 'delay', system.blockDurationRaster); % ECG input trigger
         MRF.delay_soft   = mr.makeSoftDelay(0, 'acq_end', 'offset', -round(max(MRF.prep_acq_durations),4), 'factor', 1); % block_duration [s] = offset [s] + input [s] / factor
         if numel(unique(round(MRF.acq_durations,2))) > 1
             warning('different MRF.acq_durations detected! -> variable acq windows! -> check TRs!');
