@@ -82,6 +82,10 @@ if isfield(PULSEQ.SPI, 'proj')
 else
     proj_id = PULSEQ.SPI.phi_id;
 end
+if isfield(params_reco, 'skope_full_traj') && params_reco.skope_full_traj
+    proj_id = (1:size(ktraj,2))';
+end
+clear ktraj_meas;
 
 %% noise pre-whitening
 if ~isempty(NOISE)

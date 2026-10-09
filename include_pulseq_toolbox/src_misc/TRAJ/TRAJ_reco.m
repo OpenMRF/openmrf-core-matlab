@@ -188,8 +188,8 @@ if strcmp(PULSEQ.TRAJ.method, 'robison')
     end
 
     % calculate phase prior from nominal trajectory
-    phi_calc_x = vz * 4*pi*PULSEQ.TRAJ.slice_offset * ktraj_calc_x;
-    phi_calc_y = vz * 4*pi*PULSEQ.TRAJ.slice_offset * ktraj_calc_y;
+    phi_calc_x = 4*pi*PULSEQ.TRAJ.slice_offset * ktraj_calc_x;
+    phi_calc_y = 4*pi*PULSEQ.TRAJ.slice_offset * ktraj_calc_y;
 
     % demodulate rawdata with phase prior
     rawdata_xA = rawdata_xA .* exp(-1i*phi_calc_x);
@@ -206,8 +206,10 @@ if strcmp(PULSEQ.TRAJ.method, 'robison')
     clear rawdata_xA rawdata_xB rawdata_yA rawdata_yB;
     
     % get k-space trajectory via slice offset and residual phase difference
-    ktraj_meas_x = ktraj_calc_x + (phase_xA + phase_xB) / 4 / PULSEQ.TRAJ.slice_offset /2/pi;
-    ktraj_meas_y = ktraj_calc_y + (phase_yA + phase_yB) / 4 / PULSEQ.TRAJ.slice_offset /2/pi;
+    ktraj_meas_x      = ktraj_calc_x + (phase_xA + phase_xB) / 4 / PULSEQ.TRAJ.slice_offset /2/pi;
+    ktraj_meas_y      = ktraj_calc_y + (phase_yA + phase_yB) / 4 / PULSEQ.TRAJ.slice_offset /2/pi;
+    ktraj_meas_x      = ktraj_meas_x * vz;
+    ktraj_meas_y      = ktraj_meas_y * vz;
     ktraj_meas(1,:,:) = ktraj_meas_x;
     ktraj_meas(2,:,:) = ktraj_meas_y;
     clear ktraj_calc_x ktraj_calc_y;
